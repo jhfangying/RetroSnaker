@@ -8,9 +8,9 @@ import time
 
 #增加积分功能
 #增加排行榜
-
+# class 
 class Grid:
-    cellWidth=15
+    cellWidth=30
     grid=[]
     default=0
     maxX=0
@@ -22,11 +22,18 @@ class Grid:
     frameindex=0
     framenum=60
     frame= pygame.USEREVENT
-    bg=pygame.image.load('bg.jpg')
+    bg=pygame.image.load('ground.jpeg')
+    # bg=None
+    # bgpos=bg.get_rect()
+    # bgsprit_rect=pygame.Rect(0,0,130,130)
+    tile=None
     ball=None
     score=None
+    bgmap=None
     # @profile
     def __init__(self,size):
+        
+        # self.bgpos=(size[0]/2,size[1]/2)
         self.ball=Ball()
         self.score=Score()
         self.size=size
@@ -35,9 +42,22 @@ class Grid:
         self.initGrid()
         self.addFood()
         self.addSnake()
-        
+        # self.bg.set_clip(0,0,130,130)
+        # pygame.Surface.blit()
+        # self.bg.blit()
+        # self.tile=self.bg.subsurface((0,264,133,132))
+        self.fillBg()
+        # self.bgmap.blit(self.bg,(133,0,133,132),(0,0,133,132))
         pygame.time.set_timer(self.frame,math.ceil(1000/self.framenum))
-        
+    def fillBg(self):
+        self.bgmap=pygame.Surface(self.size)
+        imagesize=(130,128)
+        maxX=math.ceil(self.size[0]/imagesize[0])
+        maxY=math.ceil(self.size[1]/imagesize[1])
+        for x in range(maxX):
+            for y in range(maxY):
+                self.bgmap.blit(self.bg,(x*imagesize[0],y*imagesize[1],imagesize[0],imagesize[1]),(1,265,imagesize[0],imagesize[1]))
+
     def initGrid(self):
         self.grid=[]
         for i in range(self.maxX):
@@ -57,7 +77,8 @@ class Grid:
             self.frameindex=(self.frameindex+1)%self.framenum
             
         if(self.frameindex%self.snake.speed==0):
-            screen.blit(pygame.transform.scale(self.bg, self.size),(0,0))
+            screen.blit(pygame.transform.scale(self.bgmap, self.size),(0,0))
+            # screen.blit(self.tile,(0,0))
             self.ball.setScreen(screen)
             self.snake.go(callback)
             self.food.addToGrid()
@@ -89,7 +110,7 @@ class Score:
         # screen.blit()
 
 class Ball:
-    size=(15,15)
+    size=(30,30)
     screen=None
     head=None
     def __init__(self):
@@ -397,5 +418,5 @@ class EndPage:
             if callback!=None :
                 callback('start')
 
-retroSnake=RetroSnaker(300,300)
+retroSnake=RetroSnaker(600,600)
 retroSnake.render()
