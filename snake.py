@@ -23,17 +23,12 @@ class Grid:
     framenum=60
     frame= pygame.USEREVENT
     bg=pygame.image.load('ground.jpeg')
-    # bg=None
-    # bgpos=bg.get_rect()
-    # bgsprit_rect=pygame.Rect(0,0,130,130)
     tile=None
     ball=None
     score=None
     bgmap=None
     # @profile
     def __init__(self,size):
-        
-        # self.bgpos=(size[0]/2,size[1]/2)
         self.ball=Ball()
         self.score=Score()
         self.size=size
@@ -42,12 +37,7 @@ class Grid:
         self.initGrid()
         self.addFood()
         self.addSnake()
-        # self.bg.set_clip(0,0,130,130)
-        # pygame.Surface.blit()
-        # self.bg.blit()
-        # self.tile=self.bg.subsurface((0,264,133,132))
         self.fillBg()
-        # self.bgmap.blit(self.bg,(133,0,133,132),(0,0,133,132))
         pygame.time.set_timer(self.frame,math.ceil(1000/self.framenum))
     def fillBg(self):
         self.bgmap=pygame.Surface(self.size)
@@ -75,10 +65,8 @@ class Grid:
             self.listenEvent(event.key,callback)
         if(event.type==self.frame):
             self.frameindex=(self.frameindex+1)%self.framenum
-            
         if(self.frameindex%self.snake.speed==0):
             screen.blit(pygame.transform.scale(self.bgmap, self.size),(0,0))
-            # screen.blit(self.tile,(0,0))
             self.ball.setScreen(screen)
             self.snake.go(callback)
             self.food.addToGrid()
@@ -90,9 +78,6 @@ class Grid:
                 self.ball.draw(food[0],food[1],food[2])
             self.score.draw(screen)
             pygame.display.flip()
-            # t2=time.perf_counter()
-            # print(t2-t1)
-    
 class Score:
     score=0
     font=None
@@ -106,9 +91,6 @@ class Score:
         textRectObj3 = scoretext.get_rect()
         textRectObj3.center = (10, 10)
         screen.blit(scoretext, textRectObj3)
-        # self.font.render_to(screen,(10,10),"分数:"+str(self.score),fgcolor=GOLD,bgcolor=BLACK,)
-        # screen.blit()
-
 class Ball:
     size=(30,30)
     screen=None
@@ -186,9 +168,8 @@ class Snake:
                 return False
             if(y<0 or y>=self.maxY):
                 return False
-        for pos in self.snake:
-            if(pos==[x,y]):
-                return False
+        if self.snake.count([x,y])>0:
+            return False
         return True
 
     def checkDead(self,callback):
@@ -234,22 +215,15 @@ class Snake:
             self.pop()
 
     def getNextPos(self,currentpos,direction):
-        nextX=0
-        nextY=0
-        if(direction=='r'):
-            nextX=currentpos[0]+1
-            nextY=currentpos[1]
-        if(direction=='l'):
-            nextX=currentpos[0]-1
-            nextY=currentpos[1]
-            newpos=[currentpos[0]-1,currentpos[1]]
-        if(direction=='u'):
-            nextX=currentpos[0]
-            nextY=currentpos[1]-1
-            newpos=[currentpos[0],currentpos[1]-1]
-        if(direction=='d'):
-            nextX=currentpos[0]
-            nextY=currentpos[1]+1
+        directions={
+            'r':(1,0),
+            'l':(-1,0),
+            'u':(0,-1),
+            'd':(0,1)
+        }
+        nextX=currentpos[0]+directions[direction][0]
+        nextY=currentpos[1]+directions[direction][1]
+   
         if(self.throughWall==True):
             if(nextX<0):
                 nextX=self.maxX-1
@@ -259,7 +233,6 @@ class Snake:
                 nextY=self.maxY-1
             if(nextY>=self.maxY):
                 nextY=0
-            # nextX=
         newpos=[nextX,nextY]
         return newpos
 
@@ -302,9 +275,7 @@ class Snake:
 
     def data(self):
         data={'snake':self.snake,'snakeObj':self.snakeobj}
-        # print(data)
         return data
-#pip install -i https://pypi.tuna.tsinghua.edu.cn/simple py2app
 
 class Food:
     x=-1
@@ -375,8 +346,7 @@ class RetroSnaker:
         if self.status=='start':
             self.start() 
         if self.status=='end':
-            self.end()              
-
+            self.end()
 class StartPage:
     bg=pygame.image.load('start.jpg')
     size=None
@@ -391,12 +361,10 @@ class StartPage:
             self.isShow=True
         if event.type==pygame.KEYDOWN:
             self.listenEvent(event.key,callback)
-
     def listenEvent(self,keycode,callback=None):
         if keycode==32:
             if callback!=None :
                 callback('start')
-
 class EndPage:
     bg=pygame.image.load('end.jpg')
     size=None
@@ -411,12 +379,9 @@ class EndPage:
             self.isShow=True
         if event.type==pygame.KEYDOWN:
             self.listenEvent(event.key,callback)
-        
-
     def listenEvent(self,keycode,callback=None):
         if keycode==32:
             if callback!=None :
                 callback('start')
-
 retroSnake=RetroSnaker(600,600)
 retroSnake.render()
